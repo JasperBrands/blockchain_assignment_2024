@@ -23,7 +23,7 @@ contract AntFactory {
     mapping (uint => address) public antToOwner;
     mapping (address => uint) ownerAntCount;
 
-    function _createAnt(string memory _name, uint _dna, Species _species, uint _winCount, uint _lossCount) internal {
+    function _createAnt(string memory _name, uint _dna, Species _species, uint _winCount, uint _lossCount) public {
         ants.push(Ant(_name, _dna, _species, _winCount, _lossCount));
         uint id = ants.length - 1;
         antToOwner[id] = msg.sender;
@@ -31,12 +31,12 @@ contract AntFactory {
         emit NewAnt(id, _name, _dna, _species, _winCount, _lossCount);
     }
 
-    function _generateRandomDna(string memory _str) private view returns (uint) {
+    function _generateRandomDna(string memory _str) public view returns (uint) {
         uint rand = uint(keccak256(abi.encodePacked(_str)));
         return rand % dnaModulus;
     }
 
-    function _generateRandomSpecies() private view returns (Species) {
+    function _generateRandomSpecies() public view returns (Species) {
         uint randSpecies = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender))) % speciesModulus;
         return Species(randSpecies);
     }

@@ -6,16 +6,17 @@ import "./victoryToken.sol";
 contract AntBattle is AntFactory {
     uint randNonce = 0;
     uint attackVictoryProbability = 50;
+    VictoryToken public victoryToken;
 
     // Define species advantages (if SpeciesA attacks SpeciesB, etc.)
     mapping(uint => mapping(uint => uint)) speciesAdvantages;
 
-    constructor() {
+    constructor(address _victoryTokenAddress) {
         // Initialize species advantages (you can adjust these values as needed)
-        speciesAdvantages[Species.FireAnt][Species.BlackCrazyAnt] = 20; // FireAnt has a 20% advantage against BlackCrazyAnt
-        speciesAdvantages[Species.BlackCrazyAnt][Species.CarpenterAnt] = 20; // BlackCrazyAnt has a 20% advantage against CarpenterAnt
-        speciesAdvantages[Species.CarpenterAnt][Species.FireAnt] = 20; // CarpenterAnt has a 20% advantage against FireAnt
-        victoryToken = VictoryToken(_victoryTokenAddress);
+        speciesAdvantages[uint(Species.FireAnt)][uint(Species.BlackCrazyAnt)] = 20; // FireAnt has a 20% advantage against BlackCrazyAnt
+        speciesAdvantages[uint(Species.BlackCrazyAnt)][uint(Species.CarpenterAnt)] = 20; // BlackCrazyAnt has a 20% advantage against CarpenterAnt
+        speciesAdvantages[uint(Species.CarpenterAnt)][uint(Species.FireAnt)] = 20; // CarpenterAnt has a 20% advantage against FireAnt 
+        victoryToken = VictoryToken(_victoryTokenAddress); // Corrected assignment
     }
 
     function randMod(uint _modulus) internal returns(uint) {
@@ -38,12 +39,15 @@ contract AntBattle is AntFactory {
         Species myAntSpecies = myAnt.species;
         Species enemyAntSpecies = enemyAnt.species;
 
-        uint speciesAdvantage = speciesAdvantages[myAntSpecies][enemyAntSpecies];
+        // uint speciesAdvantage = speciesAdvantages[myAntSpecies][enemyAntSpecies];
+        uint speciesAdvantage = speciesAdvantages[uint(myAntSpecies)][uint(enemyAntSpecies)];
 
         // Calculate final attack probability
         uint finalAttackProbability = attackVictoryProbability;
+        
         if (speciesAdvantage > 0) {
-            finalAttackProbability += speciesAdvantage; // Apply species advantage directly
+            finalAttackProbability += uint(speciesAdvantage); // Apply species advantage directly
+
         }
 
         if (rand <= finalAttackProbability) {
@@ -58,7 +62,7 @@ contract AntBattle is AntFactory {
             enemyAnt.winCount++;
 
             //give victory tokens to the winner
-            address enemyAntOwner = getAntOwner(_enemyAntId); // You need to implement this function
+            address enemyAntOwner = getAntOwner(_targetId); // Corrected usage
             victoryToken._mint(enemyAntOwner, 10 * 10 ** uint(victoryToken.decimals()));
         }
     }

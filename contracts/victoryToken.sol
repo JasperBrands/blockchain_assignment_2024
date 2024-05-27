@@ -13,7 +13,7 @@ contract VictoryToken {
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Mint(address indexed to, uint256 value);
 
-    function _mint(address _to, uint256 _value) internal {
+    function _mint(address _to, uint256 _value) public {
         totalSupply += _value;
         balanceOf[_to] += _value;
         emit Mint(_to, _value);
