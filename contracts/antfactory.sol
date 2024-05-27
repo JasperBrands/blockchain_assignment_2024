@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract AntFactory {
@@ -37,22 +38,14 @@ contract AntFactory {
 
     function _generateRandomSpecies() private view returns (Species) {
         uint randSpecies = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender))) % speciesModulus;
-        if (randSpecies == 0) {
-            return Species.FireAnt;
-        } else if (randSpecies == 1) {
-            return Species.BlackCrazyAnt;
-        } else {
-            return Species.CarpenterAnt;
-        }
+        return Species(randSpecies);
     }
 
     function createRandomAnt(string memory _name) public {
-        require(ownerAntCount[msg.sender] == 0);
+        require(ownerAntCount[msg.sender] == 0, "Each address can only own one ant");
         uint randDna = _generateRandomDna(_name);
         randDna = randDna - randDna % 100;
         Species randSpecies = _generateRandomSpecies();
-        uint winCount = 0;
-        uint lossCount = 0;
-        _createAnt(_name, randDna, randSpecies, winCount, lossCount);
+        _createAnt(_name, randDna, randSpecies, 0, 0);
     }
 }

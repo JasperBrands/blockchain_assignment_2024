@@ -1,6 +1,7 @@
 pragma solidity ^0.8.0;
 
 import "./AntFactory.sol";
+import "./victoryToken.sol";
 
 contract AntBattle is AntFactory {
     uint randNonce = 0;
@@ -11,14 +12,19 @@ contract AntBattle is AntFactory {
 
     constructor() {
         // Initialize species advantages (you can adjust these values as needed)
-        speciesAdvantages[uint(Species.FireAnt)][uint(Species.BlackCrazyAnt)] = 20; // FireAnt has a 20% advantage against BlackCrazyAnt
-        speciesAdvantages[uint(Species.BlackCrazyAnt)][uint(Species.CarpenterAnt)] = 20; // BlackCrazyAnt has a 20% advantage against CarpenterAnt
-        speciesAdvantages[uint(Species.CarpenterAnt)][uint(Species.FireAnt)] = 20; // CarpenterAnt has a 20% advantage against FireAnt
+        speciesAdvantages[Species.FireAnt][Species.BlackCrazyAnt] = 20; // FireAnt has a 20% advantage against BlackCrazyAnt
+        speciesAdvantages[Species.BlackCrazyAnt][Species.CarpenterAnt] = 20; // BlackCrazyAnt has a 20% advantage against CarpenterAnt
+        speciesAdvantages[Species.CarpenterAnt][Species.FireAnt] = 20; // CarpenterAnt has a 20% advantage against FireAnt
+        victoryToken = VictoryToken(_victoryTokenAddress);
     }
 
     function randMod(uint _modulus) internal returns(uint) {
         randNonce = randNonce + 1;
         return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, randNonce))) % _modulus;
+    }
+
+    function getAntOwner(uint _antId) internal view returns (address) {
+        return antToOwner[_antId];
     }
 
     function attack(uint _antId, uint _targetId) external {
@@ -29,11 +35,10 @@ contract AntBattle is AntFactory {
 
         uint rand = randMod(100);
 
-        // Convert species enum to uint for indexing the advantage mapping
-        uint myAntSpeciesIndex = uint(myAnt.species);
-        uint enemyAntSpeciesIndex = uint(enemyAnt.species);
+        Species myAntSpecies = myAnt.species;
+        Species enemyAntSpecies = enemyAnt.species;
 
-        uint speciesAdvantage = speciesAdvantages[myAntSpeciesIndex][enemyAntSpeciesIndex];
+        uint speciesAdvantage = speciesAdvantages[myAntSpecies][enemyAntSpecies];
 
         // Calculate final attack probability
         uint finalAttackProbability = attackVictoryProbability;
@@ -45,9 +50,16 @@ contract AntBattle is AntFactory {
             myAnt.winCount++;
             myAnt.dna += enemyAnt.dna / 10; // You can modify this logic as needed
             enemyAnt.lossCount++;
+
+            //give victory tokens to the winner 
+            victoryToken._mint(msg.sender, 10 * 10 ** uint(victoryToken.decimals()));
         } else {
             myAnt.lossCount++;
             enemyAnt.winCount++;
+
+            //give victory tokens to the winner
+            address enemyAntOwner = getAntOwner(_enemyAntId); // You need to implement this function
+            victoryToken._mint(enemyAntOwner, 10 * 10 ** uint(victoryToken.decimals()));
         }
     }
 }
