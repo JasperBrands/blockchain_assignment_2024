@@ -44,7 +44,10 @@
 // require('dotenv').config();
 // const { MNEMONIC, PROJECT_ID } = process.env;
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require("truffle-hdwallet-provider");
+const LoomTruffleProvider = require('loom-truffle-provider');
+
+const mnemonic = "ANTS";
 
 module.exports = {
   /**
@@ -96,6 +99,31 @@ module.exports = {
     //   network_id: 2111,   // This network is yours, in the cloud.
     //   production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    mainnet: {
+      provider: function () {
+        // Setting the provider with the Infura Mainnet address and Token
+        return new HDWalletProvider(mnemonic, "https://mainnet.infura.io/v3/YOUR_TOKEN")
+      },
+      network_id: "1"
+    },
+    rinkeby: {
+      // Special function to setup the provider
+      provider: function () {
+        // Setting the provider with the Infura Rinkeby address and Token
+        return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/YOUR_TOKEN")
+      },
+      network_id: 4//Fill in the `network_id` for the Rinkeby network.
+    },
+    loom_testnet: {
+      provider: function() {
+        const privateKey = 'YOUR_PRIVATE_KEY'
+        const chainId = 'extdev-plasma-us1';
+        const writeUrl = 'http://extdev-plasma-us1.dappchains.com:80/rpc';
+        const readUrl = 'http://extdev-plasma-us1.dappchains.com:80/query';
+        return new LoomTruffleProvider(chainId, writeUrl, readUrl, privateKey);
+        },
+      network_id: '9545242630824'
+    }
   },
 
   // Set default mocha options here, use special reporters, etc.

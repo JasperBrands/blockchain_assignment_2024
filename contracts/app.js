@@ -17,7 +17,8 @@ document.getElementById('mintForm').onsubmit = async (e) => {
     e.preventDefault();
 
     const antName = document.getElementById('antName').value;
-    const tokenURI = document.getElementById('tokenURI').value;
+    tokenURI = "data:application/json;base64," + antName;
+    // const tokenURI = document.getElementById('tokenURI').value;
 
     const accounts = await web3.eth.getAccounts();
     const account = accounts[0];
