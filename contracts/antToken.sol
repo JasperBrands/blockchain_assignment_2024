@@ -26,19 +26,18 @@ contract AntToken is AntBattle {
     return antToOwner[_tokenId];
   }
 
-  function _transfer(address _from, address _to, uint256 _tokenId) private {
-    // Increase ant count for the new owner and decrease for the previous owner
-    ownerAntCount[_to]++;
-    ownerAntCount[_from]--;
+  // function _transfer(address _from, address _to, uint256 _tokenId) private {
+  //   ownerAntCount[_to]++;
+  //   ownerAntCount[_from]--;
 
-    antToOwner[_tokenId] = _to;
-    emit Transfer(_from, _to, _tokenId);
-}
+  //   antToOwner[_tokenId] = _to;
+  //   emit Transfer(_from, _to, _tokenId);
+  // }
 
-  function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
-    require (antToOwner[_tokenId] == msg.sender || antApprovals[_tokenId] == msg.sender);
-    _transfer(_from, _to, _tokenId);
-  }
+  // function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
+  //   require (antToOwner[_tokenId] == msg.sender || antApprovals[_tokenId] == msg.sender);
+  //   _transfer(_from, _to, _tokenId);
+  // }
 
   // function approve(address _approved, uint256 _tokenId) external payable override onlyOwnerOf(_tokenId) {
   //   antApprovals[_tokenId] = _approved;

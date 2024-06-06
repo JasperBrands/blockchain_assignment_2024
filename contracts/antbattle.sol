@@ -74,14 +74,14 @@ contract AntBattle is AntFactory {
             enemyAnt.lossCount++;
 
             //give victory tokens to the winner 
-            victoryToken._mint(msg.sender, 10 * 10 ** uint(victoryToken.decimals()));
+            victoryToken._mint(msg.sender, 1);
         } else {
             myAnt.lossCount++;
             enemyAnt.winCount++;
 
             //give victory tokens to the winner
             address enemyAntOwner = getAntOwner(_targetId); // Corrected usage
-            victoryToken._mint(enemyAntOwner, 10 * 10 ** uint(victoryToken.decimals()));
+            victoryToken._mint(enemyAntOwner, 1);
         }
     }
 }

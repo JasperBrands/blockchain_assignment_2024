@@ -8,7 +8,7 @@ contract AntFactory {
     uint dnaDigits = 16;
     uint dnaModulus = 10 ** dnaDigits;
     uint speciesModulus = 3;
-    uint public antPrice = 10 * 10 ** 18;
+    uint public antPrice = 3;
 
     VictoryToken public victoryToken;
 
@@ -69,7 +69,7 @@ contract AntFactory {
         require(victoryToken.balanceOf(msg.sender) >= antPrice, "Insufficient VictoryTokens.");
 
         // Transfer VictoryTokens from the buyer to this contract
-        require(victoryToken.transferFrom(msg.sender, address(this), antPrice), "Token transfer failed.");
+        require(victoryToken.transfer(address(this), antPrice), "Token transfer failed.");
 
         uint randDna = _generateRandomDna(_name);
         randDna = randDna - randDna % 100;
