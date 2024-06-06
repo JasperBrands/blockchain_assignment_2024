@@ -7,14 +7,16 @@
 </head>
 <body>
     <h1>Mint Ant Token</h1>
-    <form id="mintForm">
+    <!-- function _createAnt(string memory _name, uint _dna, Species _species, uint _winCount, uint _lossCount) public { -->
+
+    <form id="getNewAnt">
         <input type="text" id="antName" placeholder="Enter Ant Name" required>
         <!-- <input type="text" id="tokenURI" placeholder="Enter Token URI" required> -->
         <button type="submit">Mint Ant Token</button>
     </form>
     <p id="status"></p>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -1,38 +1,47 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./antfactory.sol";
+import "./ownable.sol";
+import "./antbattle.sol";
 
-contract AntToken is ERC721URIStorage, Ownable {
-    AntFactory private antFactory; // Instance of AntFactory contract
-    uint256 private _tokenIdTracker;
+contract AntToken is AntBattle {
+  constructor(address _victoryTokenAddress) AntBattle(_victoryTokenAddress) {
+  }
 
-    constructor(address antFactoryAddress, address initialOwner) ERC721("Ant Token", "ANT") Ownable(initialOwner) {
-        antFactory = AntFactory(antFactoryAddress); // Initialize AntFactory contract instance
-    }
+  event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
+  // event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
 
-    function mintItem(address recipient, string memory tokenURI) public onlyOwner returns (uint256) {
-        uint256 newItemId = _getNextTokenId();
-        _mint(recipient, newItemId);
-        _setTokenURI(newItemId, tokenURI);
-        return newItemId;
-    }
+  // function balanceOf(address _owner) external view virtual returns (uint256);
+  // function ownerOf(uint256 _tokenId) external view virtual returns (address);
+  // function transferFrom(address _from, address _to, uint256 _tokenId) external payable virtual;
+  // function approve(address _approved, uint256 _tokenId) external payable virtual;
 
-    function createRandomAnt(string memory _name, string memory tokenURI) public onlyOwner {
-        uint randDna = antFactory._generateRandomDna(_name); // Call function from AntFactory contract
-        randDna = randDna - randDna % 100;
-        AntFactory.Species randSpecies = antFactory._generateRandomSpecies(); // Call function from AntFactory contract
-        antFactory._createAnt(_name, randDna, randSpecies, 0, 0); // Call function from AntFactory contract
+  mapping (uint => address) antApprovals;
 
-        uint256 newItemId = _getNextTokenId();
-        _mint(msg.sender, newItemId);
-        _setTokenURI(newItemId, tokenURI);
-    }
+  function balanceOf(address _owner) external view returns (uint256) {
+    return ownerAntCount[_owner];
+  }
 
-    function _getNextTokenId() private returns (uint256) {
-        _tokenIdTracker++;
-        return _tokenIdTracker;
-    }
+  function ownerOf(uint256 _tokenId) external view returns (address) {
+    return antToOwner[_tokenId];
+  }
+
+  function _transfer(address _from, address _to, uint256 _tokenId) private {
+    // Increase ant count for the new owner and decrease for the previous owner
+    ownerAntCount[_to]++;
+    ownerAntCount[_from]--;
+
+    antToOwner[_tokenId] = _to;
+    emit Transfer(_from, _to, _tokenId);
+}
+
+  function transferFrom(address _from, address _to, uint256 _tokenId) external payable {
+    require (antToOwner[_tokenId] == msg.sender || antApprovals[_tokenId] == msg.sender);
+    _transfer(_from, _to, _tokenId);
+  }
+
+  // function approve(address _approved, uint256 _tokenId) external payable override onlyOwnerOf(_tokenId) {
+  //   antApprovals[_tokenId] = _approved;
+  //   emit Approval(msg.sender, _approved, _tokenId);
+  // }
 }
