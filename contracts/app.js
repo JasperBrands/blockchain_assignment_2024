@@ -55,7 +55,7 @@ fetch('../build/contracts/AntBattle.json')
     // console.log(antTokenABI, antTokenAddress, antFactoryABI, antFactoryAddress, antBattleABI, antBattleAddress, victoryTokenABI, victoryTokenAddress);
 
     // Initialize Web3 with Ganache HTTP provider
-    window.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545')); // Ensure Ganache is running on this port
+    window.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
 
     // Initialize contracts
     const antBattleContract = new web3.eth.Contract(antBattleABI, antBattleAddress);

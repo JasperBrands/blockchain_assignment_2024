@@ -1,93 +1,91 @@
-# blockchain_home_assignment
+# Ant Battler Contracts
 
+## Dependencies
 
+- Web3.js (version 1.5.2): JavaScript library for interacting with the Ethereum blockchain.
+- Solidity (version ^0.8.0): Smart contract programming language.
 
-## Getting started
+## Setup
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- To setup this project you need ganache, truffle and python http server.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+1. Deleted Build folder if there is one.
+2. Open ganache, quickstart and add the truffle config file in the settings.
+3. Run truffle migrate.
+4. Copy an account address and paste it in the userAddress let in App.js (at the top of the file).
+5. Run python -m http.server 8000 (or any other post). 
 
-## Add your files
+## Overview
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+This project consists of three Solidity contracts:
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/jasper.brands/blockchain_home_assignment.git
-git branch -M main
-git push -uf origin main
-```
+1. **AntFactory.sol**: This contract makes it possible to ctreate and manage ants.
 
-## Integrate with your tools
+2. **AntBattle.sol**: This contract extends from the Antfactory and makes it possible for ant tokens to battle against each other
 
-- [ ] [Set up project integrations](https://gitlab.com/jasper.brands/blockchain_home_assignment/-/settings/integrations)
+3. **AntToken.sol**: This contract extends from the AntBattle and adds ERC-721 token functionality it makes it possible to manage the ants easier and has room for expansion (like the commented methods) to transfer ants with other people
 
-## Collaborate with your team
+4. **VictoryToken.sol**: This contract creates a Victory token which can be traded in for ants.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+## AntFactory.sol
 
-## Test and Deploy
+### Main Functions
 
-Use the built-in continuous integration in GitLab.
+- `createRandomAnt(string memory _name)`: Generates a new ant with a random DNA and species. it does this by making use of the `_generateRandomDna(string memory _str)` method and `_generateRandomSpecies()` method. An ant can only be created here if the user does not have an ant yet (with other words; the first one is free).
+- `buyAntByChoice(string memory _name, Species _species)`: Allows users to buy ants of a specific species by choice for the cost of 3 victory tokens (sadly i had to comment this code out because it didnt work in web3) the method still makes use of the `_generateRandomDna(string memory _str)` method but the difference is that it now requires a Species. An ant can only be bought if the user already has one.
+- `getAntId(uint _dna)`: Retrieves the ID of an ant based on its DNA by using the predefigned mapping `mapping (uint => uint) public dnaToId;`
+- `getAntOwner(uint _antId)`: Retrieves the owner of a specific ant by using the predefigned mapping `mapping (uint => address) public antToOwner;`
+- `getAntsByOwner(address _owner)`: Retrieves all ants owned by a specific address.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## AntBattle.sol
 
-***
+### Main Functions
 
-# Editing this README
+- `attack(uint _antDna, uint _targetDna)`: This method is made for the battling of 2 ants, these to ants have a specific species which make them have an advantage over other ants. ![advantages](image.png) It is always possible for any ant to win but the species advantage will make it more likely to win.
+- `randMod(uint _modulus)`: Generates a random number within a specified modulus to determine the winner of the battle.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## AntToken.sol
 
-## Suggestions for a good README
+### Main Functions
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- `balanceOf(address _owner)`: Retrieves the number of ants owned by a specific address.
+- `ownerOf(uint256 _tokenId)`: Retrieves the owner of a specific ant.
+- This method has a lot of commented methods, which can still be used for later expansion.
 
-## Name
-Choose a self-explaining name for your project.
+## VictoryToken.sol
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Main Functions
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- `_mintVictoryTokens(address _to, uint256 _value)`: Mints VictoryTokens and assigns them to a specified address.
+- `transfer(address _to, uint256 _value)`: Allows the user to transfer VictoryTokens to a different address.
+- `getTokenCount(address _owner)`: Gets all of the tokens from a given address.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Ownable.sol
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+-This contract is copied from cryptozombies.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+# Web3JS
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## App.js/index.html
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## Features
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+1. **Create New Ant**: Users can use the Create new ant method for their first time (or when all of the and died) to create a new ant for free.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+2. **Buy New Ant**: Users can buy a new ant for 3 VictoryTokens (sadly this part doesn't work on web3 so in reality it is free) with a species of treir own choise.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+3. **Battle with Ants**: Users can select which ants they want to battle with and against who. At the end of this battle the winner will receive a victoryToken.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+4. **View Ants**: It is possible to view all ants and their stats, this is split up in two parts: your own, and the rest.
 
-## License
-For open source projects, say how it is licensed.
+5. **Victory Token Counter**: There is a counter that will display how many victoryTokens you have at the moment. (there is a mintVictoryTokens method commented which will add 3 tokens to the users account to see that the counter acually works)
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Web3 Integration
+
+The project uses Web3.js to connect to ganache.
+
+![init contract](image-1.png)
+This is how the contracts are initialized, the usage can be read in the previous parts of the readme.
+
+![fetching data](image-2.png)
+To fetch the ABI's and Addresses from the contracts i made use of the fetch in js and fetched everything from the build files. From these build files it is easy to filter for the ABI's and Addresses.
