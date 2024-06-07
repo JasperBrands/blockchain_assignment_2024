@@ -30,9 +30,15 @@ contract("AntFactory", (accounts) => {
     it("should buy a new ant by choice", async () => {
         const antName = "TestAnt";
         const Species = { FireAnt: 0, BlackCrazyAnt: 1, CarpenterAnt: 2 };
-        await victoryTokenInstance._mint(accounts[0], 100);
+        await victoryTokenInstance._mintVictoryTokens(accounts[0], 100);
 
-        console.log("--------------------------------------------", victoryToken.balanceOf(accounts[0]));
+        // Getting the balance of accounts[0]
+        const balanceOfAccount0 = await victoryTokenInstance.getTokenCount(accounts[0]);
+
+
+        console.log("--------------------------------------------", balanceOfAccount0);
+
+        
 
         await antFactoryInstance.buyAntByChoice(antName, Species.FireAnt, { from: accounts[0] });
         const ants = await antFactoryInstance.getAnts();
@@ -54,7 +60,7 @@ contract("AntFactory", (accounts) => {
         const antName = "AnotherAnt";
         const Species = { FireAnt: 0, BlackCrazyAnt: 1, CarpenterAnt: 2 };
         await antFactoryInstance.createRandomAnt(antName, { from: accounts[1] });
-        await victoryTokenInstance._mint(accounts[1], 1);
+        await victoryTokenInstance._mintVictoryTokens(accounts[1], 1);
         try {
             await antFactoryInstance.buyAntByChoice(antName, Species.FireAnt, { from: accounts[1] });
             assert.fail("Should have reverted");

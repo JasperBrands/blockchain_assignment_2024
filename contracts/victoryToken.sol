@@ -6,28 +6,28 @@ contract VictoryToken {
     // uint8 public decimals = 18;
     uint256 public totalSupply;
 
-    mapping(address => uint256) public balanceOf;
+    mapping(address => uint256) public tokenCount;
     mapping(address => mapping(address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    event Mint(address indexed to, uint256 value);
+    event MintToken(address indexed to, uint256 value);
 
-    // function balanceOf(address _owner) external view returns (uint256) {
-    //     return ownerAntCount[_owner];
-    // }
+    function getTokenCount(address _owner) external view returns (uint256) {
+        return tokenCount[_owner];
+    }
     
-    function _mint(address _to, uint256 _value) public {
+    function _mintVictoryTokens(address _to, uint256 _value) public {
         totalSupply += _value;
-        balanceOf[_to] += _value;
-        emit Mint(_to, _value);
+        tokenCount[_to] += _value;
+        emit MintToken(_to, _value);
         emit Transfer(address(0), _to, _value);
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value, "Insufficient balance");
-        balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;
+        require(tokenCount[msg.sender] >= _value, "Insufficient balance");
+        tokenCount[msg.sender] -= _value;
+        tokenCount[_to] += _value;
         emit Transfer(msg.sender, _to, _value);
         return true;
     }

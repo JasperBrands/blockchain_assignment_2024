@@ -10,10 +10,12 @@ contract("VictoryToken", (accounts) => {
     describe("mint", () => {
         it("should mint the specified amount of tokens and increase the total supply", async () => {
             // Minting 100 tokens to accounts[0]
-            await victoryTokenInstance._mint(accounts[0], 100);
+            await victoryTokenInstance._mintVictoryTokens(accounts[0], 100);
 
             // Getting the balance of accounts[0]
-            const balanceOfAccount0 = await victoryTokenInstance.balanceOf(accounts[0]);
+            const balanceOfAccount0 = await victoryTokenInstance.getTokenCount(accounts[0]);
+
+            console.log("-----------------------", balanceOfAccount0.words[0])
 
             // Getting the total supply
             const totalSupply = await victoryTokenInstance.totalSupply();

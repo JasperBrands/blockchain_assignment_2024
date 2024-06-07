@@ -66,7 +66,7 @@ contract AntFactory {
 
     function buyAntByChoice(string memory _name, Species _species) public {
         require(ownerAntCount[msg.sender] > 0, "You must own at least one ant to buy more.");
-        require(victoryToken.balanceOf(msg.sender) >= antPrice, "Insufficient VictoryTokens.");
+        require(victoryToken.getTokenCount(msg.sender) >= antPrice, "Insufficient VictoryTokens.");
 
         // Transfer VictoryTokens from the buyer to this contract
         require(victoryToken.transfer(address(this), antPrice), "Token transfer failed.");
