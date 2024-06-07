@@ -40,7 +40,7 @@ contract AntBattle is AntFactory {
         uint finalAttackProbability = attackVictoryProbability;
         
         if (speciesAdvantage > 0) {
-            finalAttackProbability += uint(speciesAdvantage); // Apply species advantage directly
+            finalAttackProbability += uint(speciesAdvantage);
         }
 
         if (rand <= finalAttackProbability) {

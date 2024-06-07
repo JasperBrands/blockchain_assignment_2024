@@ -27,7 +27,6 @@ const SpeciesImages = {
   CarpenterAnt: 'https://www.southernliving.com/thmb/nKg03ytfQ9oS3uThP9EwQdQaa_Q=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/1435184-LGPT-b43ac09e092842239a6ea328251d7764.jpg'
 };
 
-// Define variables for additional JSON files
 fetch('../build/contracts/AntBattle.json')
   .then(response => response.json())
   .then(data => {
@@ -63,7 +62,6 @@ fetch('../build/contracts/AntBattle.json')
     const antTokenContract = new web3.eth.Contract(antTokenABI, antTokenAddress);
     const victoryTokenContract = new web3.eth.Contract(victoryTokenABI, victoryTokenAddress);
 
-    // Event listener for creating a new ant
     document.getElementById('getNewAnt').onsubmit = async (e) => {
       e.preventDefault();
       const antName = document.getElementById('antName').value;
@@ -83,7 +81,6 @@ fetch('../build/contracts/AntBattle.json')
       }
     };
 
-    // Function to fetch and log user's ants
     const getUserAnts = async () => {
         try {
             userAnts = await antFactoryContract.methods.getAntsByOwner(userAddress).call({ from: userAddress });
@@ -95,7 +92,6 @@ fetch('../build/contracts/AntBattle.json')
         }
     };
 
-    // Function to fetch and log all ants except those owned by the user
     const getEnemyAnts = async () => {
       try {
         allAnts = await antFactoryContract.methods.getAnts().call();
@@ -115,19 +111,19 @@ fetch('../build/contracts/AntBattle.json')
       const antsContainer = document.getElementById(ElementId);
       antsContainer.innerHTML = '';
       ants.forEach(ant => {
-          const speciesName = Species[ant.species];
-          const antImage = SpeciesImages[speciesName];
-          const antElement = document.createElement('div');
-          antElement.classList.add('ant');
-          antElement.innerHTML = `
-              <h2>${ant.name}</h2>
-              <p>DNA: ${ant.dna}</p>
-              <p>Species: ${speciesName}</p>
-              <p>Win Count: ${ant.winCount}</p>
-              <p>Loss Count: ${ant.lossCount}</p>
-              <img src="${antImage}" alt="${ant.name}" style="width: 200px; height: 200px;" />
-          `;
-          antsContainer.appendChild(antElement);
+        const speciesName = Species[ant.species];
+        const antImage = SpeciesImages[speciesName];
+        const antElement = document.createElement('div');
+        antElement.classList.add('ant');
+        antElement.innerHTML = `
+          <h2>${ant.name}</h2>
+          <p>DNA: ${ant.dna}</p>
+          <p>Species: ${speciesName}</p>
+          <p>Win Count: ${ant.winCount}</p>
+          <p>Loss Count: ${ant.lossCount}</p>
+          <img src="${antImage}" alt="${ant.name}" style="width: 200px; height: 200px;" />
+        `;
+        antsContainer.appendChild(antElement);
       });
     };
 
@@ -152,9 +148,7 @@ fetch('../build/contracts/AntBattle.json')
       }
     };
 
-    // Call the function to fetch and show user's ants
     getUserAnts();
-
 
     const victoryToken = async () => {
       try {
@@ -186,8 +180,6 @@ fetch('../build/contracts/AntBattle.json')
       populateAntDropdowns(nonUserAnts, 'secondAnt');
     };
     
-    // function attack(uint _antId, uint _targetId) external {
-
     document.getElementById('battleForm').onsubmit = async (e) => {
       e.preventDefault();
       const firstAntDna = document.getElementById('firstAnt').value;
@@ -198,7 +190,6 @@ fetch('../build/contracts/AntBattle.json')
 
         // console.log(firstAndid)
         // console.log(await antFactoryContract.methods.getAntOwner(firstAndid).call({ from: userAddress }))
-
 
         const result = await antBattleContract.methods.attack(firstAntDna, secondAntDna).send({ from: userAddress, gas: 200000 });
         console.log(result);
