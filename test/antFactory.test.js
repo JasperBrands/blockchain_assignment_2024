@@ -68,4 +68,16 @@ contract("AntFactory", (accounts) => {
             assert(error.message.includes("Insufficient VictoryTokens"), "Incorrect revert reason");
         }
     });
+
+    it("should return an array of ant IDs owned by the specified owner", async () => {
+        
+        // Getting the ants owned by accounts[0]
+        const antsOwnedByAccount0 = await antFactoryInstance.getAntsByOwner(accounts[0]);
+
+        console.log("------------------------------------", antsOwnedByAccount0);
+
+        // Assert the correct ants are returned
+        assert.equal(antsOwnedByAccount0.length, 1, "Should return one ant owned by accounts[0]");
+        // Add more assertions to check if the returned array contains the correct ant IDs
+    });
 });

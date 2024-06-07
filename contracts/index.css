@@ -1,0 +1,13 @@
+.antContainerTitle{
+    display: flex;
+    justify-content: center;
+}
+.ant{
+    border: 1px solid black;
+}
+#enemyAntsContainer, #antsContainer {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}

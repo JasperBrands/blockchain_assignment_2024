@@ -3,18 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
     <title>Ant Token Interaction</title>
 </head>
 <body>
-    <h1>Mint Ant Token</h1>
-    <!-- function _createAnt(string memory _name, uint _dna, Species _species, uint _winCount, uint _lossCount) public { -->
+    <h1>Ant Battler</h1>
+    
 
-    <form id="getNewAnt">
-        <input type="text" id="antName" placeholder="Enter Ant Name" required>
-        <!-- <input type="text" id="tokenURI" placeholder="Enter Token URI" required> -->
-        <button type="submit">Mint Ant Token</button>
+    <div>
+        <form id="getNewAnt">
+            <input type="text" id="antName" placeholder="Enter Ant Name" required>
+            <button type="submit">Create ant</button>
+        </form>
+        <p id="status"></p>
+    
+        <form id="buyNewAnt">
+            <input type="text" id="buyAntName" placeholder="Enter Ant Name" required>
+            <select id="speciesDropdown" required>
+                <option value="" disabled selected>Select species</option>
+                <option value="0">FireAnt</option>
+                <option value="1">BlackCrazyAnt</option>
+                <option value="2">CarpenterAnt</option>
+            </select>
+            <button type="submit">Buy new ant for 3 Victory Tokens</button>
+        </form>
+        <p id="buyStatus"></p>
+    </div>
+    <div id="victoryTokenCounter"></div>
+
+    <h2 class="antContainerTitle">Battle with you ants!</h2>
+    <div id="battleSystem"></div>
+    <form id="battleForm">
+        <label for="firstAnt">Select your first ant:</label>
+        <select id="firstAnt" required>
+            <!-- Options for the first ant -->
+        </select>
+        <label for="secondAnt">Select your second ant:</label>
+        <select id="secondAnt" required>
+            <!-- Options for the second ant -->
+        </select>
+        <button type="submit">Start Battle</button>
     </form>
-    <p id="status"></p>
+    <p id="battleStatus"></p>
+
+    <h2 class="antContainerTitle">My ants</h2>
+    <div id="antsContainer"></div>
+
+    <h2 class="antContainerTitle">Enemy ants</h2>
+    <div id="enemyAntsContainer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <script type="module" src="app.js"></script>

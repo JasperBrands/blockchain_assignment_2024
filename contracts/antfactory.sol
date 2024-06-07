@@ -30,6 +30,7 @@ contract AntFactory {
 
     mapping (uint => address) public antToOwner;
     mapping (address => uint) public ownerAntCount;
+    mapping (uint => uint) public dnaToId;
 
     constructor(address _victoryTokenAddress) {
         victoryToken = VictoryToken(_victoryTokenAddress);
@@ -40,6 +41,7 @@ contract AntFactory {
         uint id = ants.length - 1;
         antToOwner[id] = msg.sender;
         ownerAntCount[msg.sender]++;
+        dnaToId[_dna] = id;
         emit NewAnt(id, _name, _dna, _species, _winCount, _lossCount);
     }
 
@@ -64,15 +66,36 @@ contract AntFactory {
         }
     }
 
+    function getAntId(uint _dna) public view returns (uint) {
+        return dnaToId[_dna];
+    }
+
     function buyAntByChoice(string memory _name, Species _species) public {
         require(ownerAntCount[msg.sender] > 0, "You must own at least one ant to buy more.");
-        require(victoryToken.getTokenCount(msg.sender) >= antPrice, "Insufficient VictoryTokens.");
+        // require(victoryToken.getTokenCount(msg.sender) >= antPrice, "Insufficient VictoryTokens.");
 
         // Transfer VictoryTokens from the buyer to this contract
-        require(victoryToken.transfer(address(this), antPrice), "Token transfer failed.");
+        // require(victoryToken.transfer(address(this), antPrice), "Token transfer failed.");
 
         uint randDna = _generateRandomDna(_name);
         randDna = randDna - randDna % 100;
         _createAnt(_name, randDna, _species, 0, 0);
+    }
+
+    function getAntOwner(uint _antId) public view returns (address) {
+        return antToOwner[_antId];
+    }
+
+    function getAntsByOwner(address _owner) public view returns (Ant[] memory) {
+        uint ownerCount = ownerAntCount[_owner];
+        Ant[] memory result = new Ant[](ownerCount);
+        uint counter = 0;
+        for (uint i = 0; i < ants.length; i++) {
+            if (antToOwner[i] == _owner) {
+                result[counter] = ants[i];
+                counter++;
+            }
+        }
+        return result;
     }
 }

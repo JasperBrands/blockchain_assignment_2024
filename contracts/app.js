@@ -10,10 +10,25 @@ let antTokenAddress;
 let victoryTokenABI;
 let victoryTokenAddress;
 
-let userAddress = "0x25748Ed68e108667cDA7B55Dd80394C9f4574e31";
+let userAddress = "0x796278d73b2bC7a821b88Fbab3343117aD7c1a26";
+
+let allAnts;
+let userAnts;
+let nonUserAnts;
+
+const Species = {
+  0: 'FireAnt',
+  1: 'BlackCrazyAnt',
+  2: 'CarpenterAnt'
+};
+const SpeciesImages = {
+  FireAnt: 'https://media.wired.com/photos/5c1d2fde36da29336938e319/master/w_1920,c_limit/fireant-686792679.jpg',
+  BlackCrazyAnt: 'https://smarterpestcontrol.com/wp-content/uploads/2018/07/crazy-ants.jpg',
+  CarpenterAnt: 'https://www.southernliving.com/thmb/nKg03ytfQ9oS3uThP9EwQdQaa_Q=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/1435184-LGPT-b43ac09e092842239a6ea328251d7764.jpg'
+};
 
 // Define variables for additional JSON files
-fetch('http://127.0.0.1:5500/build/contracts/AntBattle.json')
+fetch('../build/contracts/AntBattle.json')
   .then(response => response.json())
   .then(data => {
     antBattleABI = data.abi;
@@ -21,9 +36,9 @@ fetch('http://127.0.0.1:5500/build/contracts/AntBattle.json')
 
     // Fetch additional JSON files
     return Promise.all([
-      fetch('http://127.0.0.1:5500/build/contracts/AntFactory.json').then(response => response.json()),
-      fetch('http://127.0.0.1:5500/build/contracts/AntToken.json').then(response => response.json()),
-      fetch('http://127.0.0.1:5500/build/contracts/VictoryToken.json').then(response => response.json())
+      fetch('../build/contracts/AntFactory.json').then(response => response.json()),
+      fetch('../build/contracts/AntToken.json').then(response => response.json()),
+      fetch('../build/contracts/VictoryToken.json').then(response => response.json())
     ]);
   })
   .then(jsonDataArray => {
@@ -37,7 +52,7 @@ fetch('http://127.0.0.1:5500/build/contracts/AntBattle.json')
     victoryTokenABI = jsonDataArray[2].abi;
     victoryTokenAddress = jsonDataArray[2].networks[5777].address;
 
-    console.log(antTokenABI, antTokenAddress, antFactoryABI, antFactoryAddress, antBattleABI, antBattleAddress, victoryTokenABI, victoryTokenAddress);
+    // console.log(antTokenABI, antTokenAddress, antFactoryABI, antFactoryAddress, antBattleABI, antBattleAddress, victoryTokenABI, victoryTokenAddress);
 
     // Initialize Web3 with Ganache HTTP provider
     window.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545')); // Ensure Ganache is running on this port
@@ -50,47 +65,153 @@ fetch('http://127.0.0.1:5500/build/contracts/AntBattle.json')
 
     // Event listener for creating a new ant
     document.getElementById('getNewAnt').onsubmit = async (e) => {
-        e.preventDefault();
-        const antName = document.getElementById('antName').value;
+      e.preventDefault();
+      const antName = document.getElementById('antName').value;
 
-        try {
-            console.log('Generating DNA for:', antName);
-            await antFactoryContract.methods.createRandomAnt(antName).send({ from: userAddress, gas: 200000 });
-            console.log('Generated ant:');
-            document.getElementById('status').innerText = `Generated new Ant`;
+      try {
+          console.log('Generating DNA for:', antName);
+          await antFactoryContract.methods.createRandomAnt(antName).send({ from: userAddress, gas: 200000 });
+          console.log('Generated ant:');
+          document.getElementById('status').innerText = `Generated new Ant`;
 
-            getUserAnts();
+          getUserAnts();
+          getEnemyAnts();
 
-        } catch (error) {
-            console.error('Error generating ant:', error);
-            document.getElementById('status').innerText = 'Error generating Ant';
-        }
+      } catch (error) {
+          console.error('Error generating ant:', error);
+          document.getElementById('status').innerText = error.message;
+      }
     };
 
     // Function to fetch and log user's ants
     const getUserAnts = async () => {
         try {
-            const ants = await antBattleContract.methods.getAntsByOwner(userAddress).call({ from: userAddress });
-            console.log('User Ants:', ants);
+            userAnts = await antFactoryContract.methods.getAntsByOwner(userAddress).call({ from: userAddress });
+            console.log('User Ants:', userAnts);
+            displayAnts(userAnts, 'antsContainer');
+            getEnemyAnts();
         } catch (error) {
             console.error('Error fetching user ants:', error);
         }
     };
 
-    const getAllAnts = async () => {
-        try {
-            const ants = await antBattleContract.methods.ownerAntCount(userAddress).call({ from: userAddress });
-            console.log('Ants:', ants);
-        } catch (error) {
-            console.error('Error fetching ants:', error);
-        }
+    // Function to fetch and log all ants except those owned by the user
+    const getEnemyAnts = async () => {
+      try {
+        allAnts = await antFactoryContract.methods.getAnts().call();
+        nonUserAnts = allAnts.filter(ant => !userAnts.some(userAnt => userAnt.dna === ant.dna));
+        console.log('Non-user Ants:', nonUserAnts);
+        displayAnts(nonUserAnts, 'enemyAntsContainer');
+
+        populateDropdowns();
+
+
+      } catch (error) {
+          console.error('Error fetching ants:', error);
+      }
     };
 
-    console.log(antBattleContract.methods)
+    const displayAnts = (ants, ElementId) => {
+      const antsContainer = document.getElementById(ElementId);
+      antsContainer.innerHTML = '';
+      ants.forEach(ant => {
+          const speciesName = Species[ant.species];
+          const antImage = SpeciesImages[speciesName];
+          const antElement = document.createElement('div');
+          antElement.classList.add('ant');
+          antElement.innerHTML = `
+              <h2>${ant.name}</h2>
+              <p>DNA: ${ant.dna}</p>
+              <p>Species: ${speciesName}</p>
+              <p>Win Count: ${ant.winCount}</p>
+              <p>Loss Count: ${ant.lossCount}</p>
+              <img src="${antImage}" alt="${ant.name}" style="width: 200px; height: 200px;" />
+          `;
+          antsContainer.appendChild(antElement);
+      });
+    };
+
+
+    // Event listener for buying a new ant
+    document.getElementById('buyNewAnt').onsubmit = async (e) => {
+      e.preventDefault();
+      const antName = document.getElementById('buyAntName').value;
+      const chosenSpecies = document.getElementById('speciesDropdown').value;
+
+      try {
+        await antFactoryContract.methods.buyAntByChoice(antName, chosenSpecies).send({ from: userAddress, gas: 200000 });
+        console.log('Generated ant:');
+        document.getElementById('buyStatus').innerText = `Bought new Ant`;
+
+        getUserAnts();
+        getEnemyAnts();
+
+      } catch (error) {
+        console.error('Error generating ant:', error);
+        document.getElementById('buyStatus').innerText = error.message;
+      }
+    };
 
     // Call the function to fetch and show user's ants
     getUserAnts();
-    getAllAnts();
+
+
+    const victoryToken = async () => {
+      try {
+        // await victoryTokenContract.methods._mintVictoryTokens(userAddress, 3).send({ from: userAddress });
+        const tokenCount = await victoryTokenContract.methods.tokenCount(userAddress).call({ from: userAddress });
+
+        const tokenContainer = document.getElementById('victoryTokenCounter');
+        tokenContainer.innerHTML = `<p>Victory Tokens: ${tokenCount}</p>`;
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    victoryToken();
+
+    const populateAntDropdowns = (ants, dropdownId) => {
+      const dropdown = document.getElementById(dropdownId);
+      dropdown.innerHTML = '<option value="" selected>Select ant</option>';
+      ants.forEach(ant => {
+        const option = document.createElement('option');
+        option.value = ant.dna;
+        option.textContent = ant.name;
+        dropdown.appendChild(option);
+      });
+    };
+    
+    const populateDropdowns = () => {
+      populateAntDropdowns(userAnts, 'firstAnt');
+      populateAntDropdowns(nonUserAnts, 'secondAnt');
+    };
+    
+    // function attack(uint _antId, uint _targetId) external {
+
+    document.getElementById('battleForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const firstAntDna = document.getElementById('firstAnt').value;
+      const secondAntDna = document.getElementById('secondAnt').value;
+      try {
+        // const firstAndid = await antFactoryContract.methods.getAntId(firstAntDna).call({ from: userAddress })
+        // const secondAndid = await antFactoryContract.methods.getAntId(secondAntDna).call({ from: userAddress })
+
+        // console.log(firstAndid)
+        // console.log(await antFactoryContract.methods.getAntOwner(firstAndid).call({ from: userAddress }))
+
+
+        const result = await antBattleContract.methods.attack(firstAntDna, secondAntDna).send({ from: userAddress, gas: 200000 });
+        console.log(result);
+        document.getElementById('battleStatus').innerText = 'Battle started successfully';
+      } catch (error) {
+        console.error('Error starting battle:', error);
+        document.getElementById('battleStatus').innerText = 'Error: ' + error.message;
+      }
+    };
+
+    
+    console.log(antFactoryContract.methods)
+    console.log(victoryTokenContract.methods)
 
   })
   .catch(error => {
