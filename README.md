@@ -1,5 +1,9 @@
 # Ant Battler Contracts
 
+# Assignment question
+- Memory: Temporary storage used for things that dont need to be saved on the blockchain (cheaper and faster).
+- Storage: Permanently storing something on the blockchain (more expensive because of gas consumption).
+
 ## Dependencies
 
 - Web3.js (version 1.5.2): JavaScript library for interacting with the Ethereum blockchain.
